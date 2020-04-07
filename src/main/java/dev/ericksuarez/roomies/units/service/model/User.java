@@ -31,7 +31,7 @@ public class User extends AuditModel {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "house_id", nullable = false)
+    @JoinColumn(name = "unit_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Unit unit;

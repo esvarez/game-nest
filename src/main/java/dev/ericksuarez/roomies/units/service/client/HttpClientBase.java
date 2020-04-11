@@ -1,20 +1,16 @@
 package dev.ericksuarez.roomies.units.service.client;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.ericksuarez.roomies.units.service.model.responses.Test;
-import dev.ericksuarez.roomies.units.service.model.responses.TokenResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.net.URI;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -35,7 +31,7 @@ public abstract class HttpClientBase {
     protected <T> T makeRequest(HttpRequest request, Class<T> tClass) {
         T responseEntity;
         try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = makeRequest(request);
             if (response.statusCode() >= 300){
                 log.error("Error");
             }
@@ -49,44 +45,59 @@ public abstract class HttpClientBase {
         }
     }
 
-
-    //Trash to test
-    //protected void makeRequest(HttpRequest request) {
-    protected void makeRequest() throws IOException, InterruptedException {
-        /*
-        HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create("https://httpbin.org/get"))
-                .setHeader("User-Agent", "Java 11 HttpClient Bot")
-                .build();
-        */
-        Map<Object, Object> data = new HashMap<>();
-        data.put("username", "admin");
-        data.put("password", "pass");
-        data.put("grant_type", "password");
-        data.put("client_id", "admin-cli");
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8083/auth/realms/master/protocol/openid-connect/token"))
-                .header("Content-Type", "application/x-www-form-urlencoded")
-
-                //.setHeader("content-type", "application/json")
-                .build();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        TokenResponse a = objectMapper.readValue(response.body().getBytes(), TokenResponse.class);
-
-        System.out.println("Done");
+    protected HttpResponse<String> makeRequest(HttpRequest request) throws IOException, InterruptedException {
+        return  httpClient.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    private boolean isOkResponse(int responseCode){
-        return responseCode >= 200 && responseCode < 300;
+    /**
+     * @param data
+     * @return
+     */
+    protected HttpRequest.BodyPublisher formUrlEncodedData(Map<Object, Object> data) {
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<Object, Object> entry : data.entrySet()) {
+            if (builder.length() > 0) {
+                builder.append("&");
+            }
+            builder.append(URLEncoder.encode(entry.getKey().toString(), StandardCharsets.UTF_8));
+            builder.append("=");
+            builder.append(URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8));
+        }
+
+        return HttpRequest.BodyPublishers.ofString(builder.toString());
     }
 
+    /**
+     * @param obj
+     * @return
+     */
+    protected StringBuilder formJsonData(Object obj) {
+        StringBuilder json = new StringBuilder().append("{");
+        Class<?> objClass = obj.getClass();
+        Field[] fields = objClass.getDeclaredFields();
+        char prefix = 0;
+        for(int i = 0; i < fields.length; i++){
+            fields[i].setAccessible(true);
+            Object value = null;
 
+            try {
+                if (!fields[i].getType().isPrimitive() && !fields[i].getType().getName().contains("java.lang")){
+                    value = formJsonData(fields[i].get(obj));
+                } else {
+                    value = fields[i].get(obj);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
 
+            if (value != null){
+                json.append(prefix);
+                prefix = ',';
+                json.append(String.format("\"%s\":\"%s\"",fields[i].getName(), value));
+            }
 
+        }
+        json.append("}");
+        return json;
+    }
 }

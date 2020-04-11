@@ -3,15 +3,11 @@ package dev.ericksuarez.roomies.units.service.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.ericksuarez.roomies.units.service.model.dto.RegisterUserDto;
 import dev.ericksuarez.roomies.units.service.model.responses.TokenResponse;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 
+import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,13 +34,14 @@ public class AuthClient extends HttpClientBase {
     }
 
     public void registerUser(RegisterUserDto userDto) {
+        //String json = formJsonData(userDto).toString();
+
         String json = new StringBuilder()
                 .append("{")
                 .append(String.format("\"email\":\"%s\",", userDto.getEmail()))
                 .append(String.format("\"enabled\":\"%s\",", userDto.isEnabled()))
                 .append(String.format("\"username\":\"%s\"", userDto.getUsername()))
                 .append("}").toString();
-        //data.put("firstName", userDto.getFirstName());
 
         TokenResponse token = getToken();
 
@@ -55,7 +52,13 @@ public class AuthClient extends HttpClientBase {
                 .header("Authorization", String.format("bearer %s", token.getAccessToken()))
                 .build();
 
-        makeRequest(request, TokenResponse.class);
+        try {
+            makeRequest(request);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -84,25 +87,11 @@ public class AuthClient extends HttpClientBase {
         return makeRequest(request, TokenResponse.class);
     }
 
-    private HttpRequest.BodyPublisher formData(Map<Object, Object> data) {
-        StringBuilder builder = new StringBuilder();
-        for (Map.Entry<Object, Object> entry : data.entrySet()) {
-            if (builder.length() > 0) {
-                builder.append("&");
-            }
-            builder.append(URLEncoder.encode(entry.getKey().toString(), StandardCharsets.UTF_8));
-            builder.append("=");
-            builder.append(URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8));
-        }
-
-        return HttpRequest.BodyPublishers.ofString(builder.toString());
-    }
-
     private HttpRequest buildAuthRequest(Map<Object, Object> data){
         System.out.println((URI.create(path + endpointAuth)));
         return HttpRequest.newBuilder()
                 .uri(URI.create(path + endpointAuth))
-                .POST(formData(data))
+                .POST(formUrlEncodedData(data))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build();
     }

@@ -13,3 +13,12 @@ spring:
     console:
       path: "/h2"
       enabled: true
+
+application:
+  authServer:
+    path: http://localhost:8083
+    endpoint:
+      auth: /auth/realms/master/protocol/openid-connect/token
+      registerUser: /auth/admin/realms/esuarez/users
+    user: admin
+    password: pass

@@ -1,4 +1,4 @@
-package dev.ericksuarez.roomies.units.service.model;
+package dev.ericksuarez.roomies.units.service.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.CreatedDate;

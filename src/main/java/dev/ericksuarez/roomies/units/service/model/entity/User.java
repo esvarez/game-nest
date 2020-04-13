@@ -1,4 +1,4 @@
-package dev.ericksuarez.roomies.units.service.model;
+package dev.ericksuarez.roomies.units.service.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -25,10 +26,11 @@ import javax.persistence.Table;
 @Table(name = "users")
 public class User extends AuditModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     private String name;
+
+    private String username;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "unit_id", nullable = false)

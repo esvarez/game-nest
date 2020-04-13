@@ -1,4 +1,4 @@
-package dev.ericksuarez.roomies.units.service.model;
+package dev.ericksuarez.roomies.units.service.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

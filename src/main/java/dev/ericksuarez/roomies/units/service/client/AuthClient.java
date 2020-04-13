@@ -1,17 +1,20 @@
 package dev.ericksuarez.roomies.units.service.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.ericksuarez.roomies.units.service.model.dto.RegisterUserDto;
 import dev.ericksuarez.roomies.units.service.model.responses.TokenResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-
+@Slf4j
+@Component
 public class AuthClient extends HttpClientBase {
 
     //@Value("${application.authServer.path}")
@@ -20,49 +23,19 @@ public class AuthClient extends HttpClientBase {
     //@Value("${app.auth-server.endpoint.auth}")
     private String endpointAuth = "/auth/realms/master/protocol/openid-connect/token";
 
-    //@Value("${app.auth-server.endpoint.register-ser}")
-    private String endpointRegisterUser = "/auth/admin/realms/esuarez/users";
-
     //@Value("${app.auth-server.user}")
     private String user = "admin";
 
     //@Value("${app.auth-server.password}")
     private String password = "pass";
 
+    private TokenResponse token;
+
     public AuthClient(HttpClient httpClient, ObjectMapper objectMapper) {
         super(httpClient, objectMapper);
     }
 
-    public void registerUser(RegisterUserDto userDto) {
-        //String json = formJsonData(userDto).toString();
-
-        String json = new StringBuilder()
-                .append("{")
-                .append(String.format("\"email\":\"%s\",", userDto.getEmail()))
-                .append(String.format("\"enabled\":\"%s\",", userDto.isEnabled()))
-                .append(String.format("\"username\":\"%s\"", userDto.getUsername()))
-                .append("}").toString();
-
-        TokenResponse token = getToken();
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(path + endpointRegisterUser))
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .header("Content-Type", "application/json")
-                .header("Authorization", String.format("bearer %s", token.getAccessToken()))
-                .build();
-
-        try {
-            makeRequest(request);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private TokenResponse getToken(){
+    public void generateToken(){
         Map<Object, Object> data = new HashMap<>();
 
         data.put("username", user);
@@ -72,10 +45,24 @@ public class AuthClient extends HttpClientBase {
 
         HttpRequest request = buildAuthRequest(data);
 
-        return makeRequest(request, TokenResponse.class);
+        token = makeRequest(request, TokenResponse.class);
     }
 
-    private TokenResponse getTokenFromRefresh(TokenResponse token){
+    public TokenResponse getToken() {
+        return token;
+    }
+
+    private HttpResponse<String> makeSafeTokenRequest(HttpRequest request) throws IOException, InterruptedException {
+        HttpResponse<String> response = makeRequest(request);
+        if (response.statusCode() == 401){
+            refreshToken();
+        } else {
+            return response;
+        }
+        return makeRequest(request);
+    }
+
+    private TokenResponse refreshToken(){
         Map<Object, Object> data = new HashMap<>();
 
         data.put("grant_type", "refresh_token");
@@ -88,7 +75,6 @@ public class AuthClient extends HttpClientBase {
     }
 
     private HttpRequest buildAuthRequest(Map<Object, Object> data){
-        System.out.println((URI.create(path + endpointAuth)));
         return HttpRequest.newBuilder()
                 .uri(URI.create(path + endpointAuth))
                 .POST(formUrlEncodedData(data))

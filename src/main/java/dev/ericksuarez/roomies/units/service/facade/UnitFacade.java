@@ -5,9 +5,11 @@ import dev.ericksuarez.roomies.units.service.model.entity.User;
 import dev.ericksuarez.roomies.units.service.service.UnitService;
 import dev.ericksuarez.roomies.units.service.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -34,5 +36,15 @@ public class UnitFacade {
         userService.saveOrUpdateUser(userUuid, user);
         log.info("event=userSaved, user={}", user);
         return unitSaved;
+    }
+
+    public Unit createUnitReference(UUID userId, Long unitId, Map<String, String> unit){
+        log.info("event=createUnitReferenceInvoked, userId={}, unitId={} unit={}", userId, unitId, unit);
+        User user = userService.findUser(userId);
+        Hibernate.initialize(user.getUnit());
+        if (user.getUnit().getId() == unitId){
+            return unitService.setUnitReference(unitId, unit);
+        }
+        throw new RuntimeException("No pertenece a la casa");
     }
 }

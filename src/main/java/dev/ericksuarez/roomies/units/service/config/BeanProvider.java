@@ -2,6 +2,7 @@ package dev.ericksuarez.roomies.units.service.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.ericksuarez.roomies.units.service.util.ReferenceGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,5 +25,11 @@ public class BeanProvider {
     public ObjectMapper objectMapper() {
         return new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    @Bean
+    @Scope("singleton")
+    public ReferenceGenerator referenceGenerator() {
+        return new ReferenceGenerator();
     }
 }

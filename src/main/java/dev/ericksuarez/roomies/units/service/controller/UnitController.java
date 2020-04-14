@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import java.util.Map;
 import java.util.UUID;
 
 import static dev.ericksuarez.roomies.units.service.config.UnitsUri.API;
@@ -58,6 +61,14 @@ public class UnitController {
                            @Valid @RequestBody Unit unit) {
         log.info("event=updateUnitInvoked unitId={}, unit={}", unitId, unit);
         return unitService.saveOrUpdateUnit(unit);
+    }
+
+    @PatchMapping(USERS + "/{userId}" + UNITS + "/{unitId}")
+    public Unit patchReference(@PathVariable(value = "userId") UUID userId,
+                             @PathVariable(value = "unitId") @Min(1) Long unitId,
+                             @RequestBody Map<String, String> unit){
+        log.info("event=patchReferenceInvoked userId={}, unitId={}, unit={}", userId, unitId, unit);
+        return unitFacade.createUnitReference(userId, unitId, unit);
     }
 
     @DeleteMapping(UNITS + "/{unitId}")

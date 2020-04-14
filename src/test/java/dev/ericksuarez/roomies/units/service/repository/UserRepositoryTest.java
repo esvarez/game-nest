@@ -15,9 +15,9 @@ public class UserRepositoryTest {
 
     @Test
     public void getUsersByUnitId_unitIdExist_returnUsers(){
-        /*val users = userRepository.getUsersByUnitId(1L);
+        val users = userRepository.getUsersByUnitId(300L);
         assertThat(users).isNotNull();
-        assertThat(users).hasSize(3);*/
+        assertThat(users).hasSize(3);
     }
 
     @Test
@@ -25,4 +25,5 @@ public class UserRepositoryTest {
         val users = userRepository.getUsersByUnitId(404L);
         assertThat(users).isEmpty();
     }
+
 }

@@ -14,10 +14,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
@@ -62,10 +64,11 @@ public class UserFacadeTest {
         doReturn(user)
                 .when(userService).registerUser(any(User.class));
 
-        val userSaved = userFacade.registerUser(userDto);
+        val userSaved = userFacade.registerUser(userDto, Optional.empty());
 
         assertNotNull(userSaved.getId());
         assertEquals(userDto.getUsername(), userSaved.getUsername());
+        assertEquals(Optional.of(1L), userSaved.getUnit().getId());
     }
 
 }

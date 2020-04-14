@@ -38,12 +38,12 @@ public class UserFacade {
         log.info("event=registerUserFacadeInvoked, userDto={}", userDto);
         AuthUserResponse userResponse = userClientService.registerServerUser(userDto);
         log.info("event=userRegisterOnAuthServer, userResponse={}", userResponse);
-        user.toBuilder()
+        User userBuilt = user.toBuilder()
                 .id(userResponse.getId())
                 .username(userDto.getUsername())
                 .build();
-        log.info("event=userBuilt, user={}", user);
-        return userService.registerUser(user);
+        log.info("event=userBuilt, userBuilt={}", userBuilt);
+        return userService.registerUser(userBuilt);
     }
 
     private User buildUser(Optional<String> unitReference) {

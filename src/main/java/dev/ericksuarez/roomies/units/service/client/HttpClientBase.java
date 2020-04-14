@@ -38,14 +38,27 @@ public abstract class HttpClientBase {
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("IO Exception");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException("");
         }
     }
 
-    protected HttpResponse<String> makeRequest(HttpRequest request) throws IOException, InterruptedException {
-        return  httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+    protected HttpResponse<String> makeRequest(HttpRequest request)  {
+        try {
+            return  httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    protected <T> T mapping(HttpResponse<String> response, Class<T> tClass) {
+        try {
+            return objectMapper.readValue(response.body().getBytes(), tClass);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

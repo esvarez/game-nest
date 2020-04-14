@@ -20,14 +20,12 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-public class UserClient extends HttpClientBase {
+public class UserClient extends AuthClient {
     //@Value("${application.authServer.path}")
     private String path = "http://localhost:8083";
 
     //@Value("${app.auth-server.endpoint.register-ser}")
     private String endpointUser = "/auth/admin/realms/esuarez/users";
-
-    private TokenResponse token;
 
     @Autowired
     public UserClient(HttpClient httpClient, ObjectMapper objectMapper) {
@@ -44,24 +42,17 @@ public class UserClient extends HttpClientBase {
                 .header("Authorization", String.format("bearer %s", token.getAccessToken()))
                 .build();
 
-        try {
-
-            HttpResponse<String> response =  makeRequest(request);
-            if (response.statusCode() == 201){
-                log.warn("event=userCreated response={}", response);
-                return response;
-                //return getUserFromEmail(userDto.getEmail());
-            } else if (response.statusCode() >= 300) {
-                log.warn("event=userNotCreated response={}, statusCode={}", response, response.statusCode());
-            }
+        HttpResponse<String> response =  makeSafeTokenRequest(request);
+        if (response.statusCode() == 201){
+            log.warn("event=userCreated response={}", response);
             return response;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return null;
+            //return getUserFromEmail(userDto.getEmail());
+        } else if (response.statusCode() == 409) {
+            throw new RuntimeException("Credential Already exist");
+        } else if (response.statusCode() >= 300) {
+            log.warn("event=userNotCreated response={}, statusCode={}", response, response.statusCode());
         }
+        return response;
     }
 
     public Optional<AuthUserResponse> getUserFromEmail(String email) {
@@ -74,7 +65,7 @@ public class UserClient extends HttpClientBase {
                 .setHeader("Authorization", String.format("bearer %s", token.getAccessToken()))
                 .build();
         log.info("event=requestAuthUserBuilt request={}", request);
-        List<LinkedHashMap> authUser = makeRequest(request, List.class);
+        List<LinkedHashMap> authUser = makeSafeTokenRequest(request, List.class);
         log.info("event=userFound authUser={}", authUser);
         return (authUser.isEmpty())
                 ? Optional.empty()

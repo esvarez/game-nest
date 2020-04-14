@@ -3,6 +3,7 @@ package dev.ericksuarez.roomies.units.service.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.ericksuarez.roomies.units.service.model.responses.TokenResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -29,8 +30,9 @@ public class AuthClient extends HttpClientBase {
     //@Value("${app.auth-server.password}")
     private String password = "pass";
 
-    private TokenResponse token;
+    protected TokenResponse token;
 
+    @Autowired
     public AuthClient(HttpClient httpClient, ObjectMapper objectMapper) {
         super(httpClient, objectMapper);
     }
@@ -52,7 +54,8 @@ public class AuthClient extends HttpClientBase {
         return token;
     }
 
-    private HttpResponse<String> makeSafeTokenRequest(HttpRequest request) throws IOException, InterruptedException {
+    protected HttpResponse<String> makeSafeTokenRequest(HttpRequest request) {
+        if (token == null) generateToken();
         HttpResponse<String> response = makeRequest(request);
         if (response.statusCode() == 401){
             refreshToken();
@@ -60,6 +63,11 @@ public class AuthClient extends HttpClientBase {
             return response;
         }
         return makeRequest(request);
+    }
+
+    protected <T> T makeSafeTokenRequest(HttpRequest request, Class<T> tClass) {
+        HttpResponse<String> response = makeSafeTokenRequest(request);
+        return mapping(response, tClass);
     }
 
     private TokenResponse refreshToken(){

@@ -1,5 +1,6 @@
 package dev.ericksuarez.roomies.units.service.model.dto;
 
+import dev.ericksuarez.roomies.units.service.model.responses.Credentials;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,6 @@ public class RegisterUserDto {
     private String username;
 
     private String firstName;
+
+    private Credentials credentials;
 }

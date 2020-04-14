@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.http.HttpResponse;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -26,7 +25,11 @@ public class UserClientService {
 
     public AuthUserResponse registerServerUser(RegisterUserDto userDto) {
         log.info("event=registerServerUserInvoked userDto={}", userDto);
-        //userClient.setToken(authClient.getToken());
+        if (authClient.getToken() == null){
+            authClient.generateToken();
+            userClient.setToken(authClient.getToken());
+        }
+
 
         HttpResponse<String> response = userClient.registerUser(userDto);
 
@@ -39,4 +42,7 @@ public class UserClientService {
         log.info("event=registerUserCalled user={}", user);
         return user;
     }
+
+
+
 }

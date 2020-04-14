@@ -23,11 +23,11 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 public class UserServiceTest {
 
-    @MockBean
-    private UserRepository userRepository;
-
     @Autowired
     private UserService userService;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
     public void getUsersByUnitId_unitIdExist_returnUsers() {

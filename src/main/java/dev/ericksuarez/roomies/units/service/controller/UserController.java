@@ -3,6 +3,7 @@ package dev.ericksuarez.roomies.units.service.controller;
 import dev.ericksuarez.roomies.units.service.facade.UserFacade;
 import dev.ericksuarez.roomies.units.service.model.dto.RegisterUserDto;
 import dev.ericksuarez.roomies.units.service.model.entity.User;
+import dev.ericksuarez.roomies.units.service.service.UnitService;
 import dev.ericksuarez.roomies.units.service.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -35,20 +36,23 @@ import static dev.ericksuarez.roomies.units.service.config.UnitsUri.USERS;
 @RequestMapping(API)
 public class UserController {
 
-    @Autowired
     private UserService userService;
 
-    @Autowired
     private UserFacade userFacade;
 
     @Autowired
-    public UserController(UserFacade userFacade) {
+    public UserController(UserFacade userFacade, UserService userService) {
         this.userFacade = userFacade;
+        this.userService = userService;
     }
 
     @GetMapping(UNITS + "/{unitId}" + USERS)
     public List<User> getUsersByUnitId(@PathVariable(value = "unitId") Long unitId) {
         log.info("event=getUsersByUnitIdInvoked, unitId={}", unitId);
+        if (unitId == 1){
+            log.info("event=unitIdDefault, unitId={}", unitId);
+            return null;
+        }
         return userService.getUsersByUnitId(unitId);
     }
 

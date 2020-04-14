@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.swing.text.html.Option;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,11 +22,10 @@ import java.util.UUID;
 import static dev.ericksuarez.roomies.units.service.config.UnitsUri.API;
 import static dev.ericksuarez.roomies.units.service.config.UnitsUri.UNITS;
 import static dev.ericksuarez.roomies.units.service.config.UnitsUri.USERS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,11 +49,6 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     private static final ObjectMapper objectMapper =  new ObjectMapper();
-
-    @Test
-    public void getUsersByUnitId_unitIdNotExist_throws404Error() {
-        assertThat(true).isTrue();
-    }
 
     @Test
     public void getUsersByUnitId_unitIdExist_returnUsers() throws Exception {

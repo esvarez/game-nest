@@ -24,4 +24,8 @@ public class Unit extends AuditModel {
     private Long id;
 
     private String description;
+
+    private Boolean active = true;
+
+    private String reference;
 }

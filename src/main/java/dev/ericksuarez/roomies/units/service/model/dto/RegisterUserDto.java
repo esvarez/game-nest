@@ -1,6 +1,7 @@
 package dev.ericksuarez.roomies.units.service.model.dto;
 
 import dev.ericksuarez.roomies.units.service.model.responses.Credentials;
+import dev.ericksuarez.roomies.units.service.model.responses.UserRegister;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,13 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class RegisterUserDto {
-    private String email;
-
-    private boolean enabled;
-
-    private String username;
-
-    private String firstName;
+    private UserRegister userRegister;
 
     private Credentials credentials;
 }

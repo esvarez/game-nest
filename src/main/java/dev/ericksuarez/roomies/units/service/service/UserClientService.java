@@ -30,13 +30,14 @@ public class UserClientService {
             userClient.setToken(authClient.getToken());
         }
 
-
         HttpResponse<String> response = userClient.registerUser(userDto);
 
         AuthUserResponse user = null;
         if (response.statusCode() == 201){
-            user = userClient.getUserFromEmail(userDto.getEmail())
-                    .orElseThrow(() -> new RuntimeException(""));
+            user = userClient.getUserFromEmail(userDto.getUserRegister().getEmail())
+                    .orElseThrow(() -> new RuntimeException("Error to create user"));
+            log.info("event=userRetrieve user={}", userClient);
+            userClient.setPassword(user.getId(), userDto.getCredentials());
         }
 
         log.info("event=registerUserCalled user={}", user);

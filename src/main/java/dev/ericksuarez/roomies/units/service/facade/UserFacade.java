@@ -4,6 +4,7 @@ import dev.ericksuarez.roomies.units.service.model.dto.RegisterUserDto;
 import dev.ericksuarez.roomies.units.service.model.entity.Unit;
 import dev.ericksuarez.roomies.units.service.model.entity.User;
 import dev.ericksuarez.roomies.units.service.model.responses.AuthUserResponse;
+import dev.ericksuarez.roomies.units.service.model.responses.UserRegister;
 import dev.ericksuarez.roomies.units.service.service.AuthClientService;
 import dev.ericksuarez.roomies.units.service.service.UserClientService;
 import dev.ericksuarez.roomies.units.service.service.UserService;
@@ -33,14 +34,16 @@ public class UserFacade {
     }
 
     public User registerUser(RegisterUserDto userDto, Optional<String> unitReference) {
-        userDto.setEnabled(true);
-        User user = buildUser(unitReference);
         log.info("event=registerUserFacadeInvoked, userDto={}", userDto);
+        UserRegister userRegister = userDto.getUserRegister();
+        userRegister.setEnabled(true);
+        User user = buildUser(unitReference);
         AuthUserResponse userResponse = userClientService.registerServerUser(userDto);
         log.info("event=userRegisterOnAuthServer, userResponse={}", userResponse);
         User userBuilt = user.toBuilder()
                 .id(userResponse.getId())
-                .username(userDto.getUsername())
+                .username(userRegister.getUsername())
+                .active(true)
                 .build();
         log.info("event=userBuilt, userBuilt={}", userBuilt);
         return userService.registerUser(userBuilt);

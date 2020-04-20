@@ -29,7 +29,12 @@ public class UnitService {
         log.info("event=findUnitInvoked, id={}", id);
         return unitRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("Unit not found"));
+    }
 
+    public Unit findUnitByReference(String reference) {
+        log.info("event=findUnitByReferenceInvoke reference={}", reference);
+        return unitRepository.findByReference(reference)
+                .orElseThrow(()-> new RuntimeException("Unit not found"));
     }
 
     public Unit saveOrUpdateUnit(Unit unit) {

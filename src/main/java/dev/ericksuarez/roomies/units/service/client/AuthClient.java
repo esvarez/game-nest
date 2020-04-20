@@ -30,7 +30,7 @@ public class AuthClient extends HttpClientBase {
     //@Value("${app.auth-server.password}")
     private String password = "pass";
 
-    protected TokenResponse token;
+    protected static TokenResponse token;
 
     @Autowired
     public AuthClient(HttpClient httpClient, ObjectMapper objectMapper) {
@@ -38,6 +38,7 @@ public class AuthClient extends HttpClientBase {
     }
 
     public void generateToken(){
+        log.info("event=generateTokenInvoked");
         Map<Object, Object> data = new HashMap<>();
 
         data.put("username", user);
@@ -48,6 +49,7 @@ public class AuthClient extends HttpClientBase {
         HttpRequest request = buildAuthRequest(data);
 
         token = makeRequest(request, TokenResponse.class);
+        log.info("event=tokenGenerate token={}", token);
     }
 
     public TokenResponse getToken() {
@@ -55,8 +57,10 @@ public class AuthClient extends HttpClientBase {
     }
 
     protected HttpResponse<String> makeSafeTokenRequest(HttpRequest request) {
-        if (token == null) generateToken();
+        log.info("event=makeSafeTokenRequestInvoked request={} token={}", request, token);
+        if (token.getAccessToken() == null) generateToken();
         HttpResponse<String> response = makeRequest(request);
+        log.info("event=safeResponse response={}", response);
         if (response.statusCode() == 401){
             refreshToken();
         } else {
@@ -70,7 +74,8 @@ public class AuthClient extends HttpClientBase {
         return mapping(response, tClass);
     }
 
-    private TokenResponse refreshToken(){
+    protected void refreshToken(){
+        log.info("event=refreshTokenInvoked");
         Map<Object, Object> data = new HashMap<>();
 
         data.put("grant_type", "refresh_token");
@@ -79,7 +84,8 @@ public class AuthClient extends HttpClientBase {
 
         HttpRequest request = buildAuthRequest(data);
 
-        return makeRequest(request, TokenResponse.class);
+        token = makeRequest(request, TokenResponse.class);
+        log.info("event=tokenRefreshed token={}", token);
     }
 
     private HttpRequest buildAuthRequest(Map<Object, Object> data){

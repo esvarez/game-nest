@@ -12,6 +12,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.function.Function;
 
 @Slf4j
 public abstract class HttpClientBase {
@@ -42,6 +43,7 @@ public abstract class HttpClientBase {
     }
 
     protected HttpResponse<String> makeRequest(HttpRequest request)  {
+        log.info("event=makeRequestInvoked request={}", request);
         try {
             return  httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException e) {

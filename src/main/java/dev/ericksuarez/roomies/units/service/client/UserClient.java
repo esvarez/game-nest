@@ -7,10 +7,8 @@ import dev.ericksuarez.roomies.units.service.model.responses.Credentials;
 import dev.ericksuarez.roomies.units.service.model.responses.TokenResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -23,6 +21,11 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class UserClient extends AuthClient {
+
+    @FunctionalInterface
+    public interface CreateRequest {
+        HttpRequest get();
+    }
     //@Value("${application.authServer.path}")
     private String path = "http://localhost:8083";
 
@@ -34,36 +37,48 @@ public class UserClient extends AuthClient {
         super(httpClient, objectMapper);
     }
 
-    public void setToken(TokenResponse token){
+    /*public void setToken(TokenResponse token){
         this.token = token;
-    }
+    }*/
 
     public HttpResponse<String> registerUser(RegisterUserDto userDto) {
+        log.info("event=registerUserInvoked userDto={} token={}", userDto, token);
         String json = formJsonData(userDto.getUserRegister());
-
-        HttpRequest request = HttpRequest.newBuilder()
+        if (token == null) generateToken();
+        int tries = 0;
+        CreateRequest registerUserRequest = () -> HttpRequest.newBuilder()
                 .uri(URI.create(path + endpointUser))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .header("Authorization", String.format("bearer %s", token.getAccessToken()))
                 .build();
 
-        HttpResponse<String> response =  makeSafeTokenRequest(request);
-        if (response.statusCode() == 201){
-            log.warn("event=userCreated response={}", response);
-            return response;
-            //return getUserFromEmail(userDto.getEmail());
-        } else if (response.statusCode() == 409) {
-            throw new RuntimeException("Credential Already exist");
-        } else if (response.statusCode() >= 300) {
-            log.warn("event=userNotCreated response={}, statusCode={}", response, response.statusCode());
-            throw new RuntimeException("Error " + response.body());
-        }
+        HttpRequest request = registerUserRequest.get();
+        HttpResponse<String> response;
+
+        do {
+            response =  makeRequest(request);
+            log.info("event=responseFromRegister response={} ", response);
+            if (response.statusCode() == 201){
+                log.warn("event=userCreated response={}", response);
+                return response;
+            } else if (response.statusCode() == 401) {
+                log.info("event=unauthorizedRequest");
+                refreshToken();
+                request = registerUserRequest.get();
+                tries++;
+            } else if (response.statusCode() == 409) {
+                throw new RuntimeException("Credential Already exist");
+            } else if (response.statusCode() >= 300) {
+                log.warn("event=userNotCreated response={}, statusCode={}", response, response.statusCode());
+                throw new RuntimeException("Error " + response.body());
+            }
+        } while (tries <= 1 );
         return response;
     }
 
     public Optional<AuthUserResponse> getUserFromEmail(String email) {
-        log.info("event=getUserFromEmailInvoked token={}, email={}", token.getAccessToken(), email);
+        log.info("event=getUserFromEmailInvoked token={}, email={}", token, email);
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(
@@ -72,7 +87,7 @@ public class UserClient extends AuthClient {
                 .setHeader("Authorization", String.format("bearer %s", token.getAccessToken()))
                 .build();
         log.info("event=requestAuthUserBuilt request={}", request);
-        List<LinkedHashMap> authUser = makeSafeTokenRequest(request, List.class);
+        List<LinkedHashMap> authUser = makeRequest(request, List.class);
         log.info("event=userFound authUser={}", authUser);
         return (authUser.isEmpty())
                 ? Optional.empty()
@@ -90,9 +105,13 @@ public class UserClient extends AuthClient {
                 .header("Authorization", String.format("bearer %s", token.getAccessToken()))
                 .build();
 
-        HttpResponse<String> response = makeSafeTokenRequest(request);
+        HttpResponse<String> response = makeRequest(request);
         System.out.println(response);
     }
+
+    /*public TokenResponse getToken() {
+        return token;
+    }*/
 
     private Optional<AuthUserResponse> castLinkedHashMapToAuthUserResponse (List<LinkedHashMap> object) {
         return object.stream()
@@ -103,5 +122,4 @@ public class UserClient extends AuthClient {
                 ))
                 .findAny();
     }
-
 }

@@ -4,11 +4,13 @@ import dev.ericksuarez.roomies.units.service.model.entity.Unit;
 import dev.ericksuarez.roomies.units.service.model.entity.User;
 import dev.ericksuarez.roomies.units.service.service.UnitService;
 import dev.ericksuarez.roomies.units.service.service.UserService;
+import dev.ericksuarez.roomies.units.service.util.ReferenceGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,10 +22,13 @@ public class UnitFacade {
 
     private UnitService unitService;
 
+    private ReferenceGenerator referenceGenerator;
+
     @Autowired
-    public UnitFacade(UserService userService, UnitService unitService){
+    public UnitFacade(UserService userService, UnitService unitService, ReferenceGenerator referenceGenerator){
         this.userService = userService;
         this.unitService = unitService;
+        this.referenceGenerator = referenceGenerator;
     }
 
     public Unit createUnit(UUID userUuid, Unit unit) {
@@ -38,11 +43,14 @@ public class UnitFacade {
         return unitSaved;
     }
 
-    public Unit createUnitReference(UUID userId, Long unitId, Map<String, String> unit){
-        log.info("event=createUnitReferenceInvoked, userId={}, unitId={} unit={}", userId, unitId, unit);
+    public Unit createUnitReference(UUID userId, Long unitId){
+        log.info("event=createUnitReferenceInvoked, userId={}, unitId={}", userId, unitId);
         User user = userService.findUser(userId);
         Hibernate.initialize(user.getUnit());
         if (user.getUnit().getId() == unitId){
+            Map<String, String> unit = new HashMap<>();
+            unit.put("reference", referenceGenerator.generateBase36(6));
+            log.info("event=referenceCreated, unit={}", unit);
             return unitService.setUnitReference(unitId, unit);
         }
         throw new RuntimeException("No pertenece a la casa");

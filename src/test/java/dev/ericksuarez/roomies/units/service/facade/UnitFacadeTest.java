@@ -4,6 +4,7 @@ import dev.ericksuarez.roomies.units.service.model.entity.Unit;
 import dev.ericksuarez.roomies.units.service.model.entity.User;
 import dev.ericksuarez.roomies.units.service.service.UnitService;
 import dev.ericksuarez.roomies.units.service.service.UserService;
+import dev.ericksuarez.roomies.units.service.util.ReferenceGenerator;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,9 +31,12 @@ public class UnitFacadeTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private ReferenceGenerator referenceGenerator;
+
     @Before
     public void setUp(){
-        unitFacade = new UnitFacade(userService, unitService);
+        unitFacade = new UnitFacade(userService, unitService, referenceGenerator);
     }
 
     @Test

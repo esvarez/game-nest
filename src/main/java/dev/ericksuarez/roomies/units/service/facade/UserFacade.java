@@ -6,6 +6,7 @@ import dev.ericksuarez.roomies.units.service.model.entity.User;
 import dev.ericksuarez.roomies.units.service.model.responses.AuthUserResponse;
 import dev.ericksuarez.roomies.units.service.model.responses.UserRegister;
 import dev.ericksuarez.roomies.units.service.service.AuthClientService;
+import dev.ericksuarez.roomies.units.service.service.UnitService;
 import dev.ericksuarez.roomies.units.service.service.UserClientService;
 import dev.ericksuarez.roomies.units.service.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +25,15 @@ public class UserFacade {
 
     private UserService userService;
 
-    private final long DEFAULT_UNIT = 1L;
+    private UnitService unitService;
+
+    private final Long DEFAULT_UNIT = 1L;
 
     @Autowired
-    public UserFacade(AuthClientService authClientService, UserClientService userClientService, UserService userService) {
+    public UserFacade(AuthClientService authClientService, UserClientService userClientService, UserService userService,
+                      UnitService unitService) {
         this.userService = userService;
+        this.unitService = unitService;
         this.authClientService = authClientService;
         this.userClientService = userClientService;
     }
@@ -37,29 +42,23 @@ public class UserFacade {
         log.info("event=registerUserFacadeInvoked, userDto={}", userDto);
         UserRegister userRegister = userDto.getUserRegister();
         userRegister.setEnabled(true);
-        User user = buildUser(unitReference);
         AuthUserResponse userResponse = userClientService.registerServerUser(userDto);
         log.info("event=userRegisterOnAuthServer, userResponse={}", userResponse);
-        User userBuilt = user.toBuilder()
+        User user = User.builder()
                 .id(userResponse.getId())
                 .username(userRegister.getUsername())
+                .unit(retrieveUnit(unitReference))
                 .active(true)
                 .build();
-        log.info("event=userBuilt, userBuilt={}", userBuilt);
-        return userService.registerUser(userBuilt);
+        log.info("event=userBuilt, userBuilt={}", user);
+        return userService.registerUser(user);
     }
 
-    private User buildUser(Optional<String> unitReference) {
-        if (unitReference.isPresent()){
-            // find unit
-            return null;
-        } else {
-            return User.builder()
-                    .unit(Unit.builder()
-                        .id(DEFAULT_UNIT)
-                        .build())
-                    .build();
-        }
+    private Unit retrieveUnit(Optional<String> unitReference) {
+        log.info("event=retrieveUnit, unitReference={}", unitReference);
+        return unitReference.isPresent()
+               ? unitService.findUnitByReference(unitReference.get())
+               : Unit.builder().id(DEFAULT_UNIT).build();
     }
 
 }

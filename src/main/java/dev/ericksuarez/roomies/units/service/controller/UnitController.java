@@ -64,11 +64,10 @@ public class UnitController {
     }
 
     @PatchMapping(USERS + "/{userId}" + UNITS + "/{unitId}")
-    public Unit patchReference(@PathVariable(value = "userId") UUID userId,
-                             @PathVariable(value = "unitId") @Min(1) Long unitId,
-                             @RequestBody Map<String, String> unit){
-        log.info("event=patchReferenceInvoked userId={}, unitId={}, unit={}", userId, unitId, unit);
-        return unitFacade.createUnitReference(userId, unitId, unit);
+    public Unit createReference(@PathVariable(value = "userId") UUID userId,
+                             @PathVariable(value = "unitId") @Min(1) Long unitId){
+        log.info("event=patchReferenceInvoked userId={}, unitId={}, unit={}", userId, unitId);
+        return unitFacade.createUnitReference(userId, unitId);
     }
 
     @DeleteMapping(UNITS + "/{unitId}")

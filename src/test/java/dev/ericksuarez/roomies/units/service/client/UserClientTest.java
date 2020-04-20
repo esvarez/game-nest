@@ -1,10 +1,9 @@
 package dev.ericksuarez.roomies.units.service.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.ericksuarez.roomies.units.service.model.dto.RegisterUserDto;
-import dev.ericksuarez.roomies.units.service.model.responses.AuthUserResponse;
 import dev.ericksuarez.roomies.units.service.model.responses.TokenResponse;
+import dev.ericksuarez.roomies.units.service.model.responses.UserRegister;
 import lombok.val;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,10 +15,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static dev.ericksuarez.roomies.units.service.util.TestUtil.buildResponseCreated;
@@ -46,10 +43,12 @@ public class UserClientTest {
     public void registerUser_userRegisterSuccess_returnCreatedStatus() throws IOException, InterruptedException {
         userClient = new UserClient(httpClient, objectMapper);
         val userDto =  RegisterUserDto.builder()
-                .email("nuevo@mail.com")
-                .enabled(true)
-                .username("nuevo")
-                .build();
+                        .userRegister(UserRegister.builder()
+                            .email("nuevo@mail.com")
+                            .enabled(true)
+                            .username("nuevo")
+                            .build())
+                        .build();
         val token = TokenResponse.builder()
                 .accessToken("Fake_Token")
                 .build();

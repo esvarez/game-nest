@@ -3,7 +3,9 @@ package dev.ericksuarez.roomies.units.service.facade;
 import dev.ericksuarez.roomies.units.service.model.dto.RegisterUserDto;
 import dev.ericksuarez.roomies.units.service.model.entity.User;
 import dev.ericksuarez.roomies.units.service.model.responses.AuthUserResponse;
+import dev.ericksuarez.roomies.units.service.model.responses.UserRegister;
 import dev.ericksuarez.roomies.units.service.service.AuthClientService;
+import dev.ericksuarez.roomies.units.service.service.UnitService;
 import dev.ericksuarez.roomies.units.service.service.UserClientService;
 import dev.ericksuarez.roomies.units.service.service.UserService;
 import lombok.val;
@@ -38,17 +40,22 @@ public class UserFacadeTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private UnitService unitService;
+
     @Before
     public void setUp(){
-        userFacade = new UserFacade(authClientService, userClientService, userService);
+        userFacade = new UserFacade(authClientService, userClientService, userService, unitService);
     }
 
     @Test
     public void registerUser_userOk_returnUser() {
         val userDto =  RegisterUserDto.builder()
-                .email("nuevo@mail.com")
-                .enabled(true)
-                .username("nuevo")
+                .userRegister(UserRegister.builder()
+                        .email("nuevo@mail.com")
+                        .enabled(true)
+                        .username("nuevo")
+                        .build())
                 .build();
         val userResponse = AuthUserResponse
                 .builder()
@@ -56,7 +63,7 @@ public class UserFacadeTest {
                 .build();
         val user = User.builder()
                 .id(userResponse.getId())
-                .username(userDto.getUsername())
+                .username(userDto.getUserRegister().getUsername())
                 .build();
 
         doReturn(userResponse)
@@ -67,7 +74,7 @@ public class UserFacadeTest {
         val userSaved = userFacade.registerUser(userDto, Optional.empty());
 
         assertNotNull(userSaved.getId());
-        assertEquals(userDto.getUsername(), userSaved.getUsername());
+        assertEquals(userDto.getUserRegister().getUsername(), userSaved.getUsername());
         assertEquals(Optional.of(1L), userSaved.getUnit().getId());
     }
 

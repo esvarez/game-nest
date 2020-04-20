@@ -25,13 +25,9 @@ public class UserClientService {
 
     public AuthUserResponse registerServerUser(RegisterUserDto userDto) {
         log.info("event=registerServerUserInvoked userDto={}", userDto);
-        if (authClient.getToken() == null){
-            authClient.generateToken();
-            userClient.setToken(authClient.getToken());
-        }
 
         HttpResponse<String> response = userClient.registerUser(userDto);
-
+        log.info("event=registerServerUserInvoked userDto={}", userDto);
         AuthUserResponse user = null;
         if (response.statusCode() == 201){
             user = userClient.getUserFromEmail(userDto.getUserRegister().getEmail())

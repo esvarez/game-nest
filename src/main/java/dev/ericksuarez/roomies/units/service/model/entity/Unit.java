@@ -25,7 +25,7 @@ public class Unit extends AuditModel {
 
     private String description;
 
-    private Boolean active = true;
+    private boolean active;
 
     private String reference;
 }

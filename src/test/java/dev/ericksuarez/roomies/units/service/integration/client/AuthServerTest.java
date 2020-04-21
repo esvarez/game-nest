@@ -39,7 +39,7 @@ public class AuthServerTest {
         authClient.generateToken();
 
         assertNotNull(authClient.getToken());
-        userClient.setToken(authClient.getToken());
+        //userClient.setToken(authClient.getToken());
         assertNotNull(userClient.getToken());
 
     }

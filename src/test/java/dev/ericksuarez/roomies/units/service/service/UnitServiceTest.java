@@ -40,7 +40,7 @@ public class UnitServiceTest {
         val unit = unitService.findUnit(1L);
 
         assertThat(unit).isNotNull();
-        assertThat(unit.getActive()).isTrue();
+        assertThat(unit.isActive()).isTrue();
     }
 
     @Test

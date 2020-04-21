@@ -84,13 +84,13 @@ public class UserFacadeTest {
                 .active(true)
                 .build();
 
-        assertTrue(user.getActive());
+        assertTrue(user.isActive());
 
         val user2 = user.toBuilder()
                 .id(UUID.randomUUID())
                 .build();
 
-        assertTrue(user2.getActive());
+        assertTrue(user2.isActive());
         assertNotNull(user2.getId());
     }
 

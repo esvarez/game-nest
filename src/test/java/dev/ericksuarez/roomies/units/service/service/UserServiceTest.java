@@ -77,7 +77,7 @@ public class UserServiceTest {
         val userSaved = userService.registerUser(user);
 
         assertThat(userSaved).isNotNull();
-        assertThat(userSaved.getActive()).isTrue();
+        assertThat(userSaved.isActive()).isTrue();
     }
 
     @Test
@@ -92,7 +92,7 @@ public class UserServiceTest {
         val userSaved = userService.saveOrUpdateUser(UUID.randomUUID() ,user);
 
         assertThat(userSaved).isNotNull();
-        assertThat(userSaved.getActive()).isTrue();
+        assertThat(userSaved.isActive()).isTrue();
     }
 
     @Test

@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:6603/roomies
     username: root
-    password: password;
+    password: ***
   h2:
     console:
       path: "/h2"

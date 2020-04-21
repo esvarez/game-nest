@@ -52,7 +52,7 @@ public class UserClientTest {
         val token = TokenResponse.builder()
                 .accessToken("Fake_Token")
                 .build();
-        userClient.setToken(token);
+        //userClient.setToken(token);
 
         doReturn(buildResponseCreated())
                 .when(httpClient).send(any(HttpRequest.class), eq(HttpResponse.BodyHandlers.ofString()));
@@ -72,7 +72,7 @@ public class UserClientTest {
         val token = TokenResponse.builder()
                 .accessToken("Fake_Token")
                 .build();
-        userClient.setToken(token);
+        //userClient.setToken(token);
         val hash = new LinkedHashMap<>();
             hash.put("id", UUID.randomUUID());
         val response = new ArrayList<>();

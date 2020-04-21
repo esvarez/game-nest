@@ -53,5 +53,5 @@ public class User extends AuditModel {
 
     private String username;
 
-    private Boolean active = true;
+    private boolean active;
 }

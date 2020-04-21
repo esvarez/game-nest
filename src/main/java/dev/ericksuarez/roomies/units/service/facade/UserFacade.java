@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -42,10 +43,11 @@ public class UserFacade {
         log.info("event=registerUserFacadeInvoked, userDto={}", userDto);
         UserRegister userRegister = userDto.getUserRegister();
         userRegister.setEnabled(true);
-        AuthUserResponse userResponse = userClientService.registerServerUser(userDto);
-        log.info("event=userRegisterOnAuthServer, userResponse={}", userResponse);
+        //AuthUserResponse userResponse = userClientService.registerServerUser(userDto);
+        //log.info("event=userRegisterOnAuthServer, userResponse={}", userResponse);
         User user = User.builder()
-                .id(userResponse.getId())
+                //.id(userResponse.getId())
+                .id(UUID.randomUUID())
                 .username(userRegister.getUsername())
                 .unit(retrieveUnit(unitReference))
                 .active(true)

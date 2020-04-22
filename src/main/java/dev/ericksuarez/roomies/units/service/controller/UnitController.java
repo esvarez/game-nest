@@ -43,35 +43,35 @@ public class UnitController {
     }
 
     @GetMapping(UNITS + "/{unitId}")
-    public Unit getUnitById(@PathVariable(value = "unitId") Long unitId) {
+    public Unit getUnitById(@PathVariable("unitId") Long unitId) {
         log.info("event=getUnitByIdInvoked, unitId={}", unitId);
         return unitService.findUnit(unitId);
     }
 
     @PostMapping(USERS + "/{uuid}" +UNITS)
     @ResponseStatus(HttpStatus.CREATED)
-    public Unit createUnit(@PathVariable(value = "uuid") UUID uuid,
+    public Unit createUnit(@PathVariable("uuid") UUID uuid,
                            @Valid @RequestBody Unit unit){
         log.info("event=createUnitInvoked, unit={}", unit);
         return unitFacade.createUnit(uuid, unit);
     }
 
     @PutMapping(UNITS + "/{unitId}")
-    public Unit updateUnit(@PathVariable(value = "unitId") Long unitId,
+    public Unit updateUnit(@PathVariable("unitId") Long unitId,
                            @Valid @RequestBody Unit unit) {
         log.info("event=updateUnitInvoked unitId={}, unit={}", unitId, unit);
         return unitService.saveOrUpdateUnit(unit);
     }
 
     @PatchMapping(USERS + "/{userId}" + UNITS + "/{unitId}")
-    public Unit createReference(@PathVariable(value = "userId") UUID userId,
-                             @PathVariable(value = "unitId") @Min(1) Long unitId){
+    public Unit createReference(@PathVariable("userId") UUID userId,
+                             @PathVariable("unitId") @Min(1) Long unitId){
         log.info("event=patchReferenceInvoked userId={}, unitId={}, unit={}", userId, unitId);
         return unitFacade.createUnitReference(userId, unitId);
     }
 
     @DeleteMapping(UNITS + "/{unitId}")
-    public ResponseEntity<?> deleteUnit(@PathVariable(value = "unitId") Long unitId) {
+    public ResponseEntity<?> deleteUnit(@PathVariable("unitId") Long unitId) {
         log.info("event=deleteUnitInvoked unitId={}", unitId);
         return unitService.deleteUnit(unitId);
     }

@@ -39,7 +39,6 @@ public class User extends AuditModel {
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "unit_id", nullable = false)
     //@OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
     private Unit unit;
 
     @ManyToMany

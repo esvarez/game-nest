@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @GetMapping(UNITS + "/{unitId}" + USERS)
-    public List<User> getUsersByUnitId(@PathVariable(value = "unitId") Long unitId) {
+    public List<User> getUsersByUnitId(@PathVariable("unitId") Long unitId) {
         log.info("event=getUsersByUnitIdInvoked, unitId={}", unitId);
         if (unitId == 1){
             log.info("event=unitIdDefault, unitId={}", unitId);
@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @GetMapping(USERS + "/{userUUID}")
-    public User getUserById(@PathVariable(value = "userUUID") UUID userUUID) {
+    public User getUserById(@PathVariable("userUUID") UUID userUUID) {
         log.info("event=getUserByIdInvoked, userUUID={}", userUUID);
         return userService.findUser(userUUID);
     }
@@ -71,7 +71,7 @@ public class UserController {
     }
 
     @PutMapping(USERS + "/{userUUID}")
-    public User updateUser(@PathVariable(value = "userUUID") UUID userUUID,
+    public User updateUser(@PathVariable("userUUID") UUID userUUID,
                            @Valid @RequestBody User user) {
         log.info("event=updateUserInvoked uuid={}, user={}", userUUID, user);
         return userService.saveOrUpdateUser(userUUID, user);
@@ -79,13 +79,13 @@ public class UserController {
 
     //TODO update password
     @PatchMapping(USERS + "/{userUUID}")
-    public User patchUser(@PathVariable(value = "userUUID") UUID userUUID,
+    public User patchUser(@PathVariable("userUUID") UUID userUUID,
                           @Valid @RequestBody RegisterUserDto user) {
         return null;
     }
 
     @DeleteMapping(USERS + "/{userUUID}")
-    public ResponseEntity<?> deleteUser(@PathVariable(value = "userUUID") UUID userUUID) {
+    public ResponseEntity<?> deleteUser(@PathVariable("userUUID") UUID userUUID) {
         log.info("event=deleteUserInvoked uuid={}", userUUID);
         return userService.deleteUser(userUUID);
     }

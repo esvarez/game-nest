@@ -23,7 +23,7 @@ import java.util.UUID;
 public class UserClient extends AuthClient {
 
     @FunctionalInterface
-    public interface CreateRequest {
+    private interface CreateRequest {
         HttpRequest get();
     }
     //@Value("${application.authServer.path}")
@@ -36,10 +36,6 @@ public class UserClient extends AuthClient {
     public UserClient(HttpClient httpClient, ObjectMapper objectMapper) {
         super(httpClient, objectMapper);
     }
-
-    /*public void setToken(TokenResponse token){
-        this.token = token;
-    }*/
 
     public HttpResponse<String> registerUser(RegisterUserDto userDto) {
         log.info("event=registerUserInvoked userDto={} token={}", userDto, token);

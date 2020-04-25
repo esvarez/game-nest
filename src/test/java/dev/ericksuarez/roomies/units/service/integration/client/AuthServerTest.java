@@ -14,6 +14,7 @@ import java.net.http.HttpClient;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @SpringBootTest
 public class AuthServerTest {
@@ -41,6 +42,7 @@ public class AuthServerTest {
         assertNotNull(authClient.getToken());
         //userClient.setToken(authClient.getToken());
         assertNotNull(userClient.getToken());
-
     }
+
+    @Test void doo() { assertTrue(false); }
 }
